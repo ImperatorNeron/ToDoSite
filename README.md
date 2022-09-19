@@ -18,9 +18,9 @@ The next step is to install all necessary packages for proper functioning. In Py
 pip install SOME-PACKAGE-NAME
 ```
 where **SOME-PACKAGE-NAME** is the package name, which is required for the project. More details about project requirements in ***requirements.txt***.
-<div style="background-color: rgba(255, 241, 43, 0.3);font-weight:bold;padding: 15px;">
-Please note, these libraries must be installed first of all!
-</div>
+<br>
+
+***Please note, these libraries must be installed first of all!***
 <br>
 
 Next, you need to upload the project folder to the directory we created. After that make it **Sources Root**.
