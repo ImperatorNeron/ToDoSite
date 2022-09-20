@@ -8,7 +8,7 @@ from .forms import SignUpForm
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     add_form = SignUpForm
-    # Виділяємо поля під окрему категорію
+    # Fields for some category
     fieldsets = (
         *UserAdmin.fieldsets,
         (

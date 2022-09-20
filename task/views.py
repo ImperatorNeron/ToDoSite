@@ -1,23 +1,20 @@
 from django.contrib.auth import logout, login
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
-from django.views.generic.base import View, TemplateView
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CreateTaskForm, SignUpForm, ProfileEditForm
 from .models import *
-from django.http import Http404, HttpResponseNotFound
-from django.template import RequestContext
+from django.http import Http404
 
 
-# Ok
-# Головна сторінка
 class Index(TemplateView):
-    template_name = "task/index.html"
+    """ Main page """
+    template_name = 'task/index.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -25,20 +22,20 @@ class Index(TemplateView):
         return context
 
 
-# Список усіх завдань
 # todo: use better naming, such as TaskView AND
 # class based views are recommended when you need to handle multiple requests at one point
 # check https://stackoverflow.com/questions/27688107/how-does-class-based-view-with-multiple-methods-work-with-urls-in-django
 class TaskView(LoginRequiredMixin, ListView):
-    template_name = "task/MyTasks.html"
+    """ Show all tasks """
+    template_name = 'task/MyTasks.html'
     model = Task
-    context_object_name = "tasks"
+    context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user).order_by("is_complete", "-pk")
+        return Task.objects.filter(user=self.request.user).order_by('is_complete', '-pk')
 
-    # Фільтруємо по юзеру, виконуємо гет запит для поля з пошуком записів.
-    # Рахуємо кількість виконаних задач, які є в списку
+    # Filter by user, perform a get request for the field with a search for records.
+    # Count the number of completed tasks that are on the list
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         search_input = self.request.GET.get('search-area') or ''
@@ -49,15 +46,14 @@ class TaskView(LoginRequiredMixin, ListView):
         context['all'] = Task.objects.filter(user=self.request.user).count()
         return context
 
-    # Позначити як виконане(або не виконано)
+    # Mark as done or not done
     @staticmethod
     def complete(request, pk):
-        # Перевірка юзера
+        # Check user
         if request.user != Task.objects.get(pk=pk).user:
             raise Http404
         data = get_object_or_404(Task, pk=pk)
-        # Виконали/не виконали
-        # Додаємо і віднімаємо + зберігаємо для того, щоб при видаленні завдання не втрачався бал
+        # Add and subtract + save so that a point is not lost when deleting a task
         if not data.is_complete:
             data.is_complete = True
             request.user.score += 1
@@ -69,9 +65,10 @@ class TaskView(LoginRequiredMixin, ListView):
         return redirect('task_page')
 
 
-# Створення завдання
 class CreateTask(LoginRequiredMixin, CreateView):
-    template_name = "task/CreateTask.html"
+    """ Create task """
+
+    template_name = 'task/CreateTask.html'
     form_class = CreateTaskForm
     success_url = reverse_lazy('task_page')
 
@@ -80,20 +77,23 @@ class CreateTask(LoginRequiredMixin, CreateView):
         return super(CreateTask, self).form_valid(form)
 
 
-# Видалення завдання
 class DeleteTask(LoginRequiredMixin, DeleteView):
+    """Delete task or all tasks"""
+
     model = Task
     template_name = 'task/DeleteTask.html'
     success_url = reverse_lazy('task_page')
 
-    # Перевіряємо чи має доступ юзер до цієї сторінки(щоб через посилання не можна було зайти на чужі завдання)
-    # Якщо це не він, піднімаємо помилку
+    # We check whether the user has access to this page
+    # (so that it is not possible to go to someone else's tasks through the link)
+    # If it is not him, we raise an error
+
     # todo: that's cool that you raised error here
     # but check if it could be solved just using get_queryset()
     def get_object(self, queryset=None):
         obj = super(DeleteTask, self).get_object()
         if obj.user != self.request.user:
-            raise Http404("Точно працює")
+            raise Http404('Точно працює')
         return obj
 
     def get_context_data(self, **kwargs):
@@ -102,37 +102,37 @@ class DeleteTask(LoginRequiredMixin, DeleteView):
         return context
 
 
-# Ономлення завдання
 class UpdateTask(LoginRequiredMixin, UpdateView):
+    """ Update task """
+
     template_name = 'task/CreateTask.html'
     model = Task
     form_class = CreateTaskForm
     success_url = reverse_lazy('task_page')
 
-    # Так само як і DeleteTask
     def get_object(self, queryset=None):
         obj = super(UpdateTask, self).get_object()
         if obj.user != self.request.user:
-            raise Http404("Точно працює")
+            raise Http404('Точно працює')
         return obj
 
 
-# Login
 class LoginAccount(LoginView):
-    template_name = "task/Login.html"
-    fields = "__all__"
+    """Login"""
+    template_name = 'task/Login.html'
+    fields = '__all__'
 
     def get_success_url(self):
         return reverse_lazy('main_page')
 
 
-# Registration
 class RegisterAccount(FormView):
-    template_name = "task/Registration.html"
+    """Registration"""
+    template_name = 'task/Registration.html'
     form_class = SignUpForm
-    success_url = reverse_lazy("main_page")
+    success_url = reverse_lazy('main_page')
 
-    # Якщо зареєструвалися, виходимо зі старого аккаунту і переходимо на новий
+    # If you have registered, log out of the old account and switch to the new one
     def form_valid(self, form):
         user = form.save()
         if user is not None:
@@ -143,41 +143,41 @@ class RegisterAccount(FormView):
 
 # Власний профіль
 class ProfileCheck(LoginRequiredMixin, DetailView):
+    """ Your profile """
     model = CustomUser
-    template_name = "task/ProfileCheck.html"
-    context_object_name = "profile"
+    template_name = 'task/ProfileCheck.html'
+    context_object_name = 'profile'
 
-    # Перевірка юзера/піднімаємо помилку
+    # Checking the user/raising an error
     def get_object(self, queryset=None):
         obj = super(ProfileCheck, self).get_object(queryset=queryset)
         if obj.username != self.request.user.username:
-            raise Http404("Точно працює")
+            raise Http404('Точно працює')
         return obj
 
 
-# Редагування профілю
 class ProfileEdit(LoginRequiredMixin, UpdateView):
-    template_name = "task/ProfileEdit.html"
+    """ Editing profile """
+    template_name = 'task/ProfileEdit.html'
     model = CustomUser
     form_class = ProfileEditForm
     success_url = reverse_lazy('main_page')
 
-    # Перевірка юзера/піднімаємо помилку
+    # Checking the user/raising an error
     def get_object(self, queryset=None):
         obj = super(ProfileEdit, self).get_object(queryset=queryset)
         if obj.username != self.request.user.username:
-            raise Http404("Точно працює")
+            raise Http404('Точно працює')
         return obj
 
 
-# ok
-# Рейтингова сторінка
 class Rating(ListView):
-    template_name = "task/Rating.html"
-    context_object_name = "user_rating"
+    """ Rating page """
+    template_name = 'task/Rating.html'
+    context_object_name = 'user_rating'
     model = CustomUser
 
-    # видаємо перших 20 людей по балах(+ імені)
+    # the first 20 people by points
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_rating'] = context['user_rating'].order_by('-score', '-username')[:20]
@@ -186,23 +186,22 @@ class Rating(ListView):
         return context
 
 
-# Перевірити чийсь профіль з рейтингу
 class CheckSomebodyProfile(DetailView):
-    template_name = "task/CheckSomebodyProfile.html"
+    """ Check somebody`s profile from rating """
+    template_name = 'task/CheckSomebodyProfile.html'
     model = CustomUser
     context_object_name = 'profile'
 
 
-# ok
-# Підгружаємо свій темплейт для 404 помилки
+# if 404 Error, redirect to page with tasks
 def page_not_found_view(request, exception):
-    return redirect("task_page")
+    return redirect('task_page')
 
 
-# Видалення всіх записів, які виконані зі списку
+# Delete all records that have been executed from the list
 def delete_all_completed_tasks(request):
-    if request.method == "POST":
-        # Беремо всі записи даного юзера, які виконані і видаляємо
+    if request.method == 'POST':
+        # We take all records of this user that have been completed and delete them
         Task.objects.filter(user=request.user, is_complete=True).delete()
         return redirect('task_page')
     return render(request, 'task/DeleteDoneTasks.html',

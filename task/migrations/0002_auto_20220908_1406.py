@@ -6,14 +6,14 @@ from django.db import migrations
 
 
 def main_page_photo_uploader(apps, schema_editor):
-    Photo = apps.get_model("task", "SiteImages")
-    Photo("1", "one", "site_photos/one.png").save()
-    Photo("2", "two", "site_photos/two.png").save()
-    Photo("3", "three", "site_photos/three.png").save()
-    Photo("4", "four", "site_photos/four.png").save()
-    Photo("5", "five", "site_photos/five.png").save()
-    Photo("6", "login", "site_photos/tasks.png").save()
-    Photo("7", "register", "site_photos/register.png").save()
+    Photo = apps.get_model('task', 'SiteImages')
+    Photo('1', 'one', 'site_photos/one.png').save()
+    Photo('2', 'two', 'site_photos/two.png').save()
+    Photo('3', 'three', 'site_photos/three.png').save()
+    Photo('4', 'four', 'site_photos/four.png').save()
+    Photo('5', 'five', 'site_photos/five.png').save()
+    Photo('6', 'login', 'site_photos/tasks.png').save()
+    Photo('7', 'register', 'site_photos/register.png').save()
 
 
 class Migration(migrations.Migration):
