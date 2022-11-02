@@ -12,6 +12,7 @@ from .models import *
 from django.http import Http404
 
 
+# ToDo: line 26 refers to each view in this file
 class Index(TemplateView):
     """ Main page """
     template_name = 'task/index.html'
@@ -50,6 +51,7 @@ class TaskView(LoginRequiredMixin, ListView):
     @staticmethod
     def complete(request, pk):
         # Check user
+        # ToDo: it should look like task = get_object_or_404(Task, pk=pk, user=request.user) instead of 55, 56, 57 lines
         if request.user != Task.objects.get(pk=pk).user:
             raise Http404
         data = get_object_or_404(Task, pk=pk)
@@ -65,6 +67,7 @@ class TaskView(LoginRequiredMixin, ListView):
         return redirect('task_page')
 
 
+# ToDo: Use viewsets, like UserProfileViewSet(ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet)!!!!!
 class CreateTask(LoginRequiredMixin, CreateView):
     """ Create task """
 
@@ -88,8 +91,8 @@ class DeleteTask(LoginRequiredMixin, DeleteView):
     # (so that it is not possible to go to someone else's tasks through the link)
     # If it is not him, we raise an error
 
-    # todo: that's cool that you raised error here
-    # but check if it could be solved just using get_queryset()
+    # todo: that's cool that you raised error here!!!!!!!!!!!!!!!
+    # but check if it could be solved just using get_queryset()!!!!!!!!!!!!
     def get_object(self, queryset=None):
         obj = super(DeleteTask, self).get_object()
         if obj.user != self.request.user:
@@ -140,7 +143,7 @@ class RegisterAccount(FormView):
             login(self.request, user)
         return super(RegisterAccount, self).form_valid(form)
 
-
+# ToDo: english, please
 # Власний профіль
 class ProfileCheck(LoginRequiredMixin, DetailView):
     """ Your profile """
@@ -193,11 +196,13 @@ class CheckSomebodyProfile(DetailView):
     context_object_name = 'profile'
 
 
+# ToDo: don't mix OOP adn functional programing, for such things you need to create utils.py and pass it there
 # if 404 Error, redirect to page with tasks
 def page_not_found_view(request, exception):
     return redirect('task_page')
 
 
+# ToDo: Don't use POST method for delete option!!!
 # Delete all records that have been executed from the list
 def delete_all_completed_tasks(request):
     if request.method == 'POST':

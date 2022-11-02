@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(validators=[phone_regex], blank=True, max_length=15)
     score = models.IntegerField(default=0)
     bio = models.TextField(blank=True)
-    # todo: its better to set constant in setting like `settings.MEDIA_ROOT`
+    # ToDo: UserIcon should be in settings like 'settings.USER_ICON_ROOT'
     photo = models.ImageField(upload_to='UserIcon/%Y/%m/%d', blank=True)
     slug = models.SlugField(blank=True)
 
@@ -30,6 +30,7 @@ class Task(models.Model):
     title = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     is_complete = models.BooleanField(default=False)
+    # ToDo: typo "creation_date"
     creation_data = models.DateTimeField(auto_now_add=True)
     to_do_date = models.DateTimeField()
 
@@ -37,6 +38,7 @@ class Task(models.Model):
         return f'{self.title}'
 
     # For admin panel
+    # ToDo: if you use localization use it everywhere, like everything in english, or in ukrainian
     class Meta:
         verbose_name = 'Завдання'
         verbose_name_plural = 'Завдання'

@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+# ToDo: Don't use * at all because of it you can get circle import errors
+# ToDo: use task.models, task.forms and so on
 from .models import *
 from .forms import SignUpForm
 
@@ -21,7 +23,7 @@ class CustomUserAdmin(UserAdmin):
         )
     )
 
-
+# ToDo: use one style of naming, like CustomUserAdmin and TaskAdmin
 class TaskAdminSettings(admin.ModelAdmin):
     list_display = ('user', 'title', 'is_complete', 'to_do_date')
     list_display_links = ('title',)

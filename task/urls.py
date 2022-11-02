@@ -2,6 +2,9 @@ from django.urls import path
 from .views import *
 from django.contrib.auth.views import LogoutView
 
+# ToDo: read about naming urls in REST, it's important!
+#  I mean for the whole crud you use the same naming with different methods
+# ToDo: read about router
 urlpatterns = [
     path('', Index.as_view(), name='main_page'),
     path('tasks/', TaskView.as_view(), name='task_page'),
@@ -16,5 +19,6 @@ urlpatterns = [
     path('rating/', Rating.as_view(), name='rating'),
     path('completion/task-<int:pk>', TaskView.complete, name='complete'),
     path('view-profile/<slug:slug>/', CheckSomebodyProfile.as_view(), name='check_somebody'),
+    # ToDo: name has another style
     path('deleting-completed-tasks/', delete_all_completed_tasks, name='DeleteDoneTasks'),
 ]

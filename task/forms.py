@@ -5,7 +5,7 @@ from .models import *
 from django import forms
 import re
 
-
+# ToDo: when you describe class or fucntion in general use docstring
 # Creation task form
 class CreateTaskForm(forms.ModelForm):
     class Meta:
@@ -63,6 +63,7 @@ class ProfileEditForm(forms.ModelForm):
         }
 
     # Validator
+    # ToDo: not enough of comments, also find better "re" pattern instead of using multiple "or" statements
     @staticmethod
     def validate_name(name, error_message):
         if re.search(r'\d', name) or re.search(r'\W', name) or re.search('_', name):
